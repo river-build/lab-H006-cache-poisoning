@@ -1,0 +1,20 @@
+# LAB VICTIM (H006a) — cache writer. Runs on pull_request_target (base-branch cache
+# scope) and saves a PR-controlled file into a fixed cache key. A fork PR thus writes
+# attacker content into a cache the default-branch workflows can restore.
+name: Cache Writer
+
+on:
+  pull_request_target:
+    types: [opened, synchronize]
+
+jobs:
+  warm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}   # attacker tree
+      - uses: actions/cache/save@v4
+        with:
+          path: payload.sh
+          key: lab-poison-cache

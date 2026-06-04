@@ -1,0 +1,19 @@
+# LAB VICTIM (H006b) — cache consumer. Restores the shared cache key and EXECUTES the
+# restored file with the secret in env. If a prior PR poisoned that key, this runs
+# attacker content in a privileged context.
+name: Cache Consumer
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      LAB_SECRET: ${{ secrets.LAB_SECRET }}
+    steps:
+      - uses: actions/cache/restore@v4
+        with:
+          path: payload.sh
+          key: lab-poison-cache
+      - run: bash payload.sh || true
